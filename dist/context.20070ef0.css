@@ -1,0 +1,25 @@
+* {
+    font-size: 1.8rem;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    background: beige;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    color: salmon;
+}
+
+.container {
+    height: 100vh;
+}
+
+button {
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/*# sourceMappingURL=/context.20070ef0.css.map */

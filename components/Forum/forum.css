@@ -1,0 +1,118 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: rgba(0, 0, 0, 0.877)
+}
+button{
+    cursor: pointer;
+}
+p {
+    color: white;
+    text-align: center;
+}
+
+label, h4 {
+    color: white;
+}
+.sort{
+    display: flex;
+    margin-left: auto;
+    width: 200px;
+}
+
+.sort select, .sort button{
+    padding: 5px;   
+    cursor:pointer
+}
+
+.post{
+    display: flex;
+    width: 50%;
+    margin: auto;
+}
+
+.post input {
+    width: 800px;
+    height: 80px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.post button {
+    cursor: pointer;
+    background: lightseagreen;
+    color: black;
+    font-weight: 900;
+    font-size:1.1rem;
+    border: none
+}
+
+.comment {
+    display: flex;
+    width: 50%;
+    margin: 10px auto;
+    border: 1px solid white;
+    background: white;
+}
+
+.comment button {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.vote {
+    display: flex;
+    margin-left: auto;
+}
+
+.up {
+    background: lightgreen;
+    width: 20px;
+    height: 40px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 100;
+}
+.down {
+    background: rgb(250, 93, 93);
+    width: 20px;
+    height: 40px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 100;
+}
+
+.count{
+    display: flex;
+    margin-left: auto;
+    border: 1px solid black;
+}
+
+.user {
+    width: 80%;
+    display: block;
+    margin: auto;
+    overflow-wrap: break-word;
+    max-height: 100px;
+    overflow: scroll;
+}
+
+.user h1 {
+    text-align: center;
+}
+
+.box{
+    max-height: 500px;
+    overflow: scroll;
+}
+
+.setting {
+    display: block;
+    width: 50%;
+    margin: auto;
+    text-align: center;
+}

@@ -1,0 +1,54 @@
+article {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    border: 1px solid black;
+}
+
+.comment {
+    width: 380px;
+    padding: 20px;
+    background: black;
+    color: white;
+}
+
+.users {
+    width: 380px;
+    background: green;
+    color: yellow;
+}
+
+.posts {
+    width: 380px;
+    background: red;
+    color: darkblue;
+}
+
+.profile, .preference {
+    display: flex;
+    flex-direction: column;
+    background: darkcyan;
+    width: 500px;
+    margin: auto;
+}
+
+.profile p, .preference p {
+    width: 100px;
+}
+
+.profile hr, .preference p{
+    width: 100px
+}
+
+table {
+    border: 2px solid beige;
+}
+
+thead {
+    border: 2px solid pink;
+}
+
+tr {
+    border: 1px solid green;
+}
