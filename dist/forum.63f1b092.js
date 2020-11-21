@@ -29845,7 +29845,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = SettingProvider;
-exports.useToggleSetting = exports.useSetting = void 0;
+exports.useHidden = exports.useToggleSetting = exports.useSetting = void 0;
 
 var _react = _interopRequireWildcard(require("react"));
 
@@ -29869,6 +29869,8 @@ var UserSetting = _react.default.createContext();
 
 var ChangeSetting = _react.default.createContext();
 
+var IsHidden = _react.default.createContext();
+
 var useSetting = function useSetting() {
   return (0, _react.useContext)(UserSetting);
 };
@@ -29880,6 +29882,13 @@ var useToggleSetting = function useToggleSetting() {
 };
 
 exports.useToggleSetting = useToggleSetting;
+
+var useHidden = function useHidden() {
+  var hidden = (0, _react.useContext)(IsHidden);
+  return hidden;
+};
+
+exports.useHidden = useHidden;
 
 var reducer = function reducer(state, action) {
   switch (action.type) {
@@ -29902,11 +29911,21 @@ function SettingProvider(_ref) {
       state = _useReducer2[0],
       dispatch = _useReducer2[1];
 
-  return /*#__PURE__*/_react.default.createElement(UserSetting.Provider, {
+  var _useState = (0, _react.useState)(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      isHidden = _useState2[0],
+      setIsHidden = _useState2[1];
+
+  return /*#__PURE__*/_react.default.createElement(IsHidden.Provider, {
+    value: {
+      isHidden: isHidden,
+      handleHidden: setIsHidden
+    }
+  }, /*#__PURE__*/_react.default.createElement(UserSetting.Provider, {
     value: state
   }, /*#__PURE__*/_react.default.createElement(ChangeSetting.Provider, {
     value: dispatch
-  }, children));
+  }, children)));
 }
 },{"react":"../node_modules/react/index.js"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
@@ -30083,7 +30102,7 @@ var _reactDom = _interopRequireDefault(require("react-dom"));
 
 var _ThemeProvider = _interopRequireDefault(require("./ThemeProvider"));
 
-var _SettingProvider = _interopRequireDefault(require("./SettingProvider"));
+var _SettingProvider = _interopRequireWildcard(require("./SettingProvider"));
 
 var _Setting = _interopRequireDefault(require("./Setting"));
 
@@ -30115,11 +30134,34 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-var useUserInput = function useUserInput(initialValue) {
-  var _useState = (0, _react.useState)(initialValue),
+var MyContext = _react.default.createContext();
+
+var useCMyContext = function useCMyContext() {
+  var myContext = (0, _react.useContext)(MyContext);
+  return myContext;
+};
+
+var DeeplyNestedComponent = function DeeplyNestedComponent() {
+  var count = useMyContext();
+  return /*#__PURE__*/_react.default.createElement("p", null, "Current count is ", count);
+};
+
+var App = function App() {
+  var _useState = (0, _react.useState)(0),
       _useState2 = _slicedToArray(_useState, 2),
-      value = _useState2[0],
-      setValue = _useState2[1];
+      count = _useState2[0],
+      setCount = _useState2[1];
+
+  return /*#__PURE__*/_react.default.createElement(MyContext.Provider, {
+    value: count
+  }, children);
+};
+
+var useUserInput = function useUserInput(initialValue) {
+  var _useState3 = (0, _react.useState)(initialValue),
+      _useState4 = _slicedToArray(_useState3, 2),
+      value = _useState4[0],
+      setValue = _useState4[1];
 
   var handleChange = function handleChange(_ref) {
     var target = _ref.target;
@@ -30212,25 +30254,28 @@ var reducer = function reducer(state, action) {
 var Forum = function Forum() {
   var comment = useUserInput('');
 
-  var _useState3 = (0, _react.useState)(false),
-      _useState4 = _slicedToArray(_useState3, 2),
-      hide = _useState4[0],
-      setHide = _useState4[1];
+  var _useState5 = (0, _react.useState)(false),
+      _useState6 = _slicedToArray(_useState5, 2),
+      hide = _useState6[0],
+      setHide = _useState6[1];
 
   var _useReducer = (0, _react.useReducer)(reducer, []),
       _useReducer2 = _slicedToArray(_useReducer, 2),
       state = _useReducer2[0],
       dispatch = _useReducer2[1];
 
-  var _useState5 = (0, _react.useState)('Sort'),
-      _useState6 = _slicedToArray(_useState5, 2),
-      select = _useState6[0],
-      setSelect = _useState6[1];
-
-  var _useState7 = (0, _react.useState)(0),
+  var _useState7 = (0, _react.useState)('Sort'),
       _useState8 = _slicedToArray(_useState7, 2),
-      order = _useState8[0],
-      setOrder = _useState8[1];
+      select = _useState8[0],
+      setSelect = _useState8[1];
+
+  var _useState9 = (0, _react.useState)(0),
+      _useState10 = _slicedToArray(_useState9, 2),
+      order = _useState10[0],
+      setOrder = _useState10[1];
+
+  var _useHidden = (0, _SettingProvider.useHidden)(),
+      isHidden = _useHidden.isHidden;
 
   var handleClick = function handleClick(e) {
     e.preventDefault();
@@ -30249,8 +30294,12 @@ var Forum = function Forum() {
     });
   };
 
+  if (isHidden) {
+    return null;
+  }
+
   if (!hide) {
-    return /*#__PURE__*/_react.default.createElement(_SettingProvider.default, null, /*#__PURE__*/_react.default.createElement(WindowWidth, null), /*#__PURE__*/_react.default.createElement("button", {
+    return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(WindowWidth, null), /*#__PURE__*/_react.default.createElement("button", {
       onClick: function onClick() {
         return setHide(function (prevHide) {
           return !prevHide;
@@ -30270,7 +30319,7 @@ var Forum = function Forum() {
       comments: state,
       dispatch: dispatch,
       select: select
-    })), /*#__PURE__*/_react.default.createElement(_Setting.default, null)));
+    })), /*#__PURE__*/_react.default.createElement(_Setting.default, null)), /*#__PURE__*/_react.default.createElement(Page, null));
   } else {
     return /*#__PURE__*/_react.default.createElement("button", {
       onClick: function onClick() {
@@ -30280,6 +30329,10 @@ var Forum = function Forum() {
       }
     }, "Unhide");
   }
+};
+
+var Main = function Main() {
+  return /*#__PURE__*/_react.default.createElement(_SettingProvider.default, null, /*#__PURE__*/_react.default.createElement(Forum, null));
 };
 
 var Sorting = function Sorting(_ref2) {
@@ -30368,10 +30421,10 @@ var DisplayComment = function DisplayComment(_ref4) {
 };
 
 var WindowWidth = function WindowWidth() {
-  var _useState9 = (0, _react.useState)(window.innerWidth),
-      _useState10 = _slicedToArray(_useState9, 2),
-      windowWidth = _useState10[0],
-      setWindowWidth = _useState10[1];
+  var _useState11 = (0, _react.useState)(window.innerWidth),
+      _useState12 = _slicedToArray(_useState11, 2),
+      windowWidth = _useState12[0],
+      setWindowWidth = _useState12[1];
 
   (0, _react.useEffect)(function () {
     var handleOnResize = function handleOnResize() {
@@ -30386,7 +30439,50 @@ var WindowWidth = function WindowWidth() {
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, windowWidth);
 };
 
-_reactDom.default.render( /*#__PURE__*/_react.default.createElement(Forum, null), document.getElementById('root'));
+var Page = function Page() {
+  var _useState13 = (0, _react.useState)(20),
+      _useState14 = _slicedToArray(_useState13, 2),
+      count = _useState14[0],
+      setCount = _useState14[1];
+
+  var _useHidden2 = (0, _SettingProvider.useHidden)(),
+      isHidden = _useHidden2.isHidden,
+      handleHidden = _useHidden2.handleHidden;
+
+  console.log(isHidden);
+  (0, _react.useEffect)(function () {
+    if (count === 0) {
+      handleHidden(true);
+    }
+  }, [count]);
+  (0, _react.useEffect)(function () {
+    var id = setInterval(function () {
+      return setCount(function (prevCount) {
+        return prevCount - 1;
+      });
+    }, 1000);
+
+    if (isHidden) {
+      clearInterval(id);
+    }
+
+    return function () {
+      return clearInterval(id);
+    };
+  }, [isHidden]);
+
+  var convertTime = function convertTime(time) {
+    var s = time % 60 === 0 ? 0 : time % 60;
+    var m = time % 60 === 0 ? time / 60 : (time - time % 60) / 60;
+    var isZero = m < 10 ? 0 : '';
+    var isSecondZero = s < 10 ? 0 : '';
+    return "".concat(isZero).concat(m, ":").concat(isSecondZero).concat(s);
+  };
+
+  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("p", null, convertTime(count)));
+};
+
+_reactDom.default.render( /*#__PURE__*/_react.default.createElement(Main, null), document.getElementById('root'));
 },{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","./ThemeProvider":"../components/Forum/ThemeProvider.js","./SettingProvider":"../components/Forum/SettingProvider.js","./Setting":"../components/Forum/Setting.js","./forum.css":"../components/Forum/forum.css"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -30415,7 +30511,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64462" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55045" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

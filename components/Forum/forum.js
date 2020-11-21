@@ -3,7 +3,24 @@ import ReactDOM from 'react-dom';
 import ThemeProvider from './ThemeProvider';
 import UserSetting from './SettingProvider';
 import Setting from './Setting';
+import { useHidden } from './SettingProvider';
 import './forum.css';
+
+const MyContext = React.createContext();
+
+const useCMyContext = () => {
+  const myContext = useContext(MyContext);
+  return myContext;
+};
+
+const DeeplyNestedComponent = () => {
+  const count = useMyContext();
+  return <p>Current count is {count}</p>;
+};
+const App = () => {
+  const [count, setCount] = useState(0);
+  return <MyContext.Provider value={count}>{children}</MyContext.Provider>;
+};
 
 const useUserInput = initialValue => {
   const [value, setValue] = useState(initialValue);
@@ -82,6 +99,7 @@ const Forum = () => {
   const [state, dispatch] = useReducer(reducer, []);
   const [select, setSelect] = useState('Sort');
   const [order, setOrder] = useState(0);
+  const { isHidden } = useHidden();
   const handleClick = e => {
     e.preventDefault();
     dispatch({
@@ -96,9 +114,12 @@ const Forum = () => {
     });
     setOrder(prevOrder => prevOrder + 1);
   };
+  if (isHidden) {
+    return null;
+  }
   if (!hide) {
     return (
-      <UserSetting>
+      <>
         <WindowWidth />
         <button onClick={() => setHide(prevHide => !prevHide)}>Hide</button>
         <ThemeProvider>
@@ -113,13 +134,22 @@ const Forum = () => {
           </div>
           <Setting />
         </ThemeProvider>
-      </UserSetting>
+        <Page />
+      </>
     );
   } else {
     return (
       <button onClick={() => setHide(prevHide => !prevHide)}>Unhide</button>
     );
   }
+};
+
+const Main = () => {
+  return (
+    <UserSetting>
+      <Forum />
+    </UserSetting>
+  );
 };
 
 const Sorting = ({ dispatch, select, setSelect }) => {
@@ -209,4 +239,34 @@ const WindowWidth = () => {
   }, []);
   return <>{windowWidth}</>;
 };
-ReactDOM.render(<Forum />, document.getElementById('root'));
+
+const Page = () => {
+  const [count, setCount] = useState(20);
+  const { isHidden, handleHidden } = useHidden();
+  console.log(isHidden);
+  useEffect(() => {
+    if (count === 0) {
+      handleHidden(true);
+    }
+  }, [count]);
+  useEffect(() => {
+    const id = setInterval(() => setCount(prevCount => prevCount - 1), 1000);
+    if (isHidden) {
+      clearInterval(id);
+    }
+    return () => clearInterval(id);
+  }, [isHidden]);
+  const convertTime = time => {
+    let s = time % 60 === 0 ? 0 : time % 60;
+    let m = time % 60 === 0 ? time / 60 : (time - (time % 60)) / 60;
+    let isZero = m < 10 ? 0 : '';
+    let isSecondZero = s < 10 ? 0 : '';
+    return `${isZero}${m}:${isSecondZero}${s}`;
+  };
+  return (
+    <>
+      <p>{convertTime(count)}</p>
+    </>
+  );
+};
+ReactDOM.render(<Main />, document.getElementById('root'));
