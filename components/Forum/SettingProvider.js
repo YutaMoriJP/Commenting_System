@@ -1,5 +1,7 @@
 import React, { useState, useReducer, useContext } from 'react';
 
+import PropTypes from 'prop-types';
+
 const UserSetting = React.createContext();
 
 const ChangeSetting = React.createContext();
@@ -28,6 +30,8 @@ const reducer = (state, action) => {
 };
 
 export default function SettingProvider({ children }) {
+  console.log(children);
+  console.log(typeof children);
   const [state, dispatch] = useReducer(reducer, {});
   const [isHidden, setIsHidden] = useState(false);
   return (
@@ -40,3 +44,7 @@ export default function SettingProvider({ children }) {
     </IsHidden.Provider>
   );
 }
+
+SettingProvider.propTypes = {
+  children: PropTypes.object.isRequired,
+};

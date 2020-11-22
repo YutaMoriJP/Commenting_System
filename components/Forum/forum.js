@@ -1,25 +1,61 @@
-import React, { useState, useEffect, useReducer, useContext } from 'react';
+import React, { useState, useEffect, useReducer, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import ThemeProvider from './ThemeProvider';
 import UserSetting from './SettingProvider';
 import Setting from './Setting';
 import { useHidden } from './SettingProvider';
+import { RefTutorial, AdvancedComponent, DOMPractice } from './Ref';
 import './forum.css';
 
-const MyContext = React.createContext();
-
-const useCMyContext = () => {
-  const myContext = useContext(MyContext);
-  return myContext;
-};
-
-const DeeplyNestedComponent = () => {
-  const count = useMyContext();
-  return <p>Current count is {count}</p>;
-};
-const App = () => {
-  const [count, setCount] = useState(0);
-  return <MyContext.Provider value={count}>{children}</MyContext.Provider>;
+const Forum = () => {
+  const comment = useUserInput('');
+  const [hide, setHide] = useState(false);
+  const [state, dispatch] = useReducer(reducer, []);
+  const [select, setSelect] = useState('Sort');
+  const [order, setOrder] = useState(0);
+  const { isHidden } = useHidden();
+  const handleClick = e => {
+    e.preventDefault();
+    dispatch({
+      type: 'add',
+      payload: {
+        comment: comment.value,
+        id: Date.now(),
+        count: 0,
+        order: order,
+        sortAlgortihm: select,
+      },
+    });
+    setOrder(prevOrder => prevOrder + 1);
+  };
+  if (isHidden) {
+    return null;
+  }
+  if (!hide) {
+    return (
+      <>
+        <button onClick={() => setHide(prevHide => !prevHide)}>Hide</button>
+        <DOMPractice />
+        <ThemeProvider>
+          <Sorting dispatch={dispatch} select={select} setSelect={setSelect} />
+          <p>Total Comments: {state.length}</p>
+          <div className="post">
+            <input {...comment} />
+            <button onClick={handleClick}>Post</button>
+          </div>
+          <div className="box">
+            <Comment comments={state} dispatch={dispatch} select={select} />
+          </div>
+          <Setting />
+        </ThemeProvider>
+        <Page />
+      </>
+    );
+  } else {
+    return (
+      <button onClick={() => setHide(prevHide => !prevHide)}>Unhide</button>
+    );
+  }
 };
 
 const useUserInput = initialValue => {
@@ -93,55 +129,67 @@ const reducer = (state, action) => {
   }
 };
 
-const Forum = () => {
-  const comment = useUserInput('');
-  const [hide, setHide] = useState(false);
-  const [state, dispatch] = useReducer(reducer, []);
-  const [select, setSelect] = useState('Sort');
-  const [order, setOrder] = useState(0);
-  const { isHidden } = useHidden();
-  const handleClick = e => {
-    e.preventDefault();
-    dispatch({
-      type: 'add',
-      payload: {
-        comment: comment.value,
-        id: Date.now(),
-        count: 0,
-        order: order,
-        sortAlgortihm: select,
-      },
-    });
-    setOrder(prevOrder => prevOrder + 1);
+const useCompare = count => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = count;
+  }, [count]);
+  const current = ref.current;
+  return current;
+};
+
+const AdvancedCounter = () => {
+  const [count, setCount] = useState(0);
+  const previous = useRef();
+  useEffect(() => {
+    previous.current = count;
+  });
+  const previousCount = previous.current;
+  return (
+    <>
+      <button onClick={() => setCount(p => p + 1)}>+</button>
+      <p>
+        Now: {count} Previous: {previousCount}
+      </p>
+    </>
+  );
+};
+
+const NewCount = () => {
+  const [count, setCount] = useState(0);
+  const old = useCompare(count);
+  return (
+    <>
+      <button onClick={() => setCount(p => p + 1)}>+</button>
+      <p>
+        Now: {count} Old: {old}
+      </p>
+    </>
+  );
+};
+
+const W = () => {
+  const [count, setCount] = useState(0);
+  const myRef = useRef(0);
+  useEffect(() => {
+    myRef.current = count;
+  });
+  const handleAlertClick = () => {
+    setTimeout(
+      () =>
+        alert(
+          `The count when you clicked was ${count} but currently is: ${myRef.current}`
+        ),
+      3000
+    );
   };
-  if (isHidden) {
-    return null;
-  }
-  if (!hide) {
-    return (
-      <>
-        <WindowWidth />
-        <button onClick={() => setHide(prevHide => !prevHide)}>Hide</button>
-        <ThemeProvider>
-          <Sorting dispatch={dispatch} select={select} setSelect={setSelect} />
-          <p>Total Comments: {state.length}</p>
-          <div className="post">
-            <input {...comment} />
-            <button onClick={handleClick}>Post</button>
-          </div>
-          <div className="box">
-            <Comment comments={state} dispatch={dispatch} select={select} />
-          </div>
-          <Setting />
-        </ThemeProvider>
-        <Page />
-      </>
-    );
-  } else {
-    return (
-      <button onClick={() => setHide(prevHide => !prevHide)}>Unhide</button>
-    );
-  }
+  return (
+    <>
+      <p>Current {count}</p>
+      <button onClick={() => setCount(p => p + 1)}>+</button>
+      <button onClick={handleAlertClick}>Show alert</button>
+    </>
+  );
 };
 
 const Main = () => {
@@ -240,10 +288,57 @@ const WindowWidth = () => {
   return <>{windowWidth}</>;
 };
 
+const useFormInputs = initial => {
+  const [value, setValue] = useState(initial);
+  const handleChange = e => setValue(e.target.value);
+  return { value, onChange: handleChange };
+};
+
+const useWidth = () => {
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const resize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', resize);
+    return () => window.removeEventListener('resize', resize);
+  }, []);
+  return width;
+};
+
+const UserInputs = () => {
+  const name = useFormInputs('Yuta');
+  const age = useFormInputs(25);
+  const userName = useFormInputs('Zaizen');
+  const w = useWidth();
+  return (
+    <>
+      <input {...name} />
+      <input {...age} />
+      <input {...userName} />
+      <p>{w}</p>
+    </>
+  );
+};
+
+const Compare = () => {
+  const [count, setCount] = useState(0);
+  const prevCount = useRef();
+  useEffect(() => {
+    prevCount.current = count;
+  });
+  const prev = prevCount.current;
+  return (
+    <>
+      <button onClick={() => setCount(p => p + 1)}>+</button>
+      <p>
+        Now: {count} - {prev}
+      </p>
+    </>
+  );
+};
+
 const Page = () => {
-  const [count, setCount] = useState(20);
+  const [count, setCount] = useState(120);
   const { isHidden, handleHidden } = useHidden();
-  console.log(isHidden);
   useEffect(() => {
     if (count === 0) {
       handleHidden(true);
@@ -269,4 +364,5 @@ const Page = () => {
     </>
   );
 };
+
 ReactDOM.render(<Main />, document.getElementById('root'));
